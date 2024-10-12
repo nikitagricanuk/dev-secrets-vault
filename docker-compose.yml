@@ -4,12 +4,15 @@ services:
       dockerfile: Dockerfile.vault
       context: .
     ports:
-      - 8000
+      - 8000:8000
 
 
   postgres:
     image: "mirror.gcr.io/postgres:17"
-    ports:
-      - 5432
     volumes:
-      psql:
+      - psql_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+volumes:
+  psql_data:
