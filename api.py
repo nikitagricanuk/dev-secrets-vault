@@ -10,8 +10,8 @@ class User(BaseModel):
     username: str
     email: str
     role: str
-    password: str
-    extra_priveleges: dict = None
+    password: str = None
+    extra_priveleges: dict = {}
 
 @router.post("/v1/users")
 async def list_users():
