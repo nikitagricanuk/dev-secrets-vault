@@ -4,7 +4,10 @@ import bcrypt
 
 async def generate_password(section_length = 6, number_of_sections = 3):
     alphabet = ascii_letters + digits
-    sections = ''.join(secrets.choice(alphabet) for _ in range(section_length) for _ in range(number_of_sections))
+    sections = [] # TODO: дописать генерацию паролей
+    for i in range(number_of_sections):
+        for i in range(section_length):
+            sections[0] += i
     password = '-'.join(sections)
     return password
 
