@@ -18,7 +18,7 @@ async def create_user(username, email, role, password = None, extra_privileges =
     
     # Creating a user account
     if password is None:
-        password = await generate_password(password)
+        password = await generate_password()
     password_hash = await generate_password_hash(password)
 
     with conn.cursor() as cursor:
