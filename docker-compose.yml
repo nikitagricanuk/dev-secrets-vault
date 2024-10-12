@@ -7,7 +7,9 @@ services:
       - 8000
 
 
-  db:
+  postgres:
     image: "mirror.gcr.io/postgres:17"
     ports:
       - 5432
+    volumes:
+      psql:
