@@ -72,3 +72,10 @@ POST /v1/users/{username}/delete
 POST /v1/secrets/create
 ```
 
+### Работа с политиками безопасности:
+
+Посмотреть установленные политики
+```
+POST /v1/politics
+```
+
