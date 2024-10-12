@@ -1,0 +1,11 @@
+FROM mirror.gcr.io/postgres:17
+
+USER postgres
+
+COPY databases/init_db.sql /docker-entrypoint-initdb.d/init_db.sql
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 5432
+
+CMD ["postgres"]
