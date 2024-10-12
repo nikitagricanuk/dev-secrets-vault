@@ -11,5 +11,5 @@ CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     role_name VARCHAR(255) UNIQUE NOT NULL,
-    extra_privileges TEXT[] DEFAULT {}
+    extra_privileges TEXT[] DEFAULT '{}'
 );
