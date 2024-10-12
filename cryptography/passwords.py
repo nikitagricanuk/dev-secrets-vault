@@ -10,14 +10,14 @@ async def generate_password(section_length = 6, number_of_sections = 3):
 
 async def generate_password_hash(password = None):
     if password is None:
-        password = generate_password()
+        password = await generate_password()
 
     salt = bcrypt.gensalt() # generate salt to improve password security
 
     hashed_password =  bcrypt.hashpw(password.encode('utf8'), salt)
 
-    if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-        generate_password_hash(password)
+    if not(bcrypt.checkpw(password.encode('utf-8'), hashed_password)):
+        await generate_password_hash(password)
 
     return hashed_password
 
