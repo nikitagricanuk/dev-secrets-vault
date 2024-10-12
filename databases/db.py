@@ -1,6 +1,6 @@
 import psycopg2
-from main import DB_NAME, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT
-from cryptography.passwords import generate_password_hash
+from config import DB_NAME, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT
+from cryptography.passwords import generate_password, generate_password_hash
 
 try:
     conn = psycopg2.connect(database=DB_NAME,
@@ -10,23 +10,36 @@ try:
                             port=DB_PORT)
 except:
     print("Error: Could not connect to the database")
+    conn = None
 
-async def create_user(username, email, role, password = None, extra_privileges = None):
+async def create_user(username, email, role, password = None, extra_privileges = {}):
+    if conn is None:
+        return {"error": "No database connection"}
+    
     # Creating a user account
-    password_hash = generate_password_hash(password)
+    if password is None:
+        password = await generate_password(password)
+    password_hash = await generate_password_hash(password)
 
     with conn.cursor() as cursor:
         try:
-            cursor.execute(f"INSERT INTO users (username, email, password_hash) VALUES ({username}, {email}, {password_hash})")
+            cursor.execute(
+                "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                (username, email, password_hash.decode('utf-8')) 
+            )
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
     # Setting user role
-    set_user_role(username, role, extra_privileges)
+    await set_user_role(username, role, extra_privileges)
 
-async def set_user_role(username, role, extra_privileges = None):
+    return {"username": username, 
+            "password": password,
+            "role": role}
+
+async def set_user_role(username, role, extra_privileges = {}):
     with conn.cursor() as cursor:
         try:
-            cursor.execute(f"INSERT INTO roles (username, role, extra_privileges) VALUES ({username}, {role}, {extra_privileges})")
+            cursor.execute(f"INSERT INTO roles (username, role_name, extra_privileges) VALUES (\'{username}\', \'{role}\', \'{extra_privileges}\')")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
