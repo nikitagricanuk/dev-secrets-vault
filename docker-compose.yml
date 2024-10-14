@@ -2,7 +2,7 @@ services:
   vault:
     build: 
       dockerfile: Dockerfile.vault
-      context: .
+      context: backend/
     ports:
       - 8000:8000
     restart: always
@@ -10,7 +10,7 @@ services:
   postgres:
     build: 
       dockerfile: Dockerfile.postgres
-      context: .
+      context: backend/
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
