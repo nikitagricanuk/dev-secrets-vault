@@ -5,7 +5,6 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HT
 from cryptography.passwords import compare_password_with_hash
 from api.session import create_new_session, validate_session, delete_session, renew_session
 from config import JWT_SECRET_KEY
-from jose import jwt
 
 router = APIRouter()
 
@@ -64,9 +63,9 @@ async def api_revoke_token(credentials: HTTPAuthorizationCredentials = Depends(s
 #     # тут должна быть бизнес-логика СУБД
 #     return {"message": "Listing users"}
 
-# @router.post("/v1/auth/users/create")
-# async def api_create_user(user: User):
-#     return await create_user(user.username, user.email, user.role, user.password, user.extra_priveleges)
+@router.post("/v1/auth/users/create")
+async def api_create_user(user: User):
+    return await create_user(user.username, user.email, user.role, user.password, user.extra_priveleges)
 
 # @router.delete("/v1/auth/users/{user.username}") # TODO: rewrite this correctly
 # async def api_delete_user(user: User):
