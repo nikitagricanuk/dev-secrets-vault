@@ -1,4 +1,4 @@
-FROM mirror.gcr.io/postgres:17
+FROM mirror.gcr.io/postgres:11.5
 
 USER postgres
 
