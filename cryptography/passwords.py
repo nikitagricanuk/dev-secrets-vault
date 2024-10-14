@@ -24,3 +24,5 @@ async def generate_password_hash(password = None):
 
     return hashed_password
 
+async def compare_password_with_hash(password, hashed_password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
