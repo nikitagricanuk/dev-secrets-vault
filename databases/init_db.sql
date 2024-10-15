@@ -12,5 +12,10 @@ CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     role_name VARCHAR(255) UNIQUE NOT NULL,
-    extra_privileges TEXT[] DEFAULT '{}'
+);
+
+CREATE TABLE secrets (
+    id SERIAL PRIMARY KEY,
+    group VARCHAR(255) NOT NULL,
+    sectet_data jsonb NOT NULL
 );

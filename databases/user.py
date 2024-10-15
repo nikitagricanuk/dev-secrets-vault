@@ -1,15 +1,11 @@
 import psycopg2
 from psycopg2 import Error
-from config import DB_NAME, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT
 from cryptography.passwords import generate_password, generate_password_hash
-
-def connect_db():
-    return psycopg2.connect(database=DB_NAME, user=DB_USERNAME, 
-                            password=DB_PASSWORD, host=DB_HOST, 
-                            port=DB_PORT)
+from . import connect_db
 
 
-async def create_user(username, email, role, password = None, extra_privileges = {}):
+
+async def create_user(username, email, role, password = None):
     try:
         db_connection = connect_db()
         cursor = db_connection.cursor()
@@ -22,7 +18,7 @@ async def create_user(username, email, role, password = None, extra_privileges =
     password_hash = await generate_password_hash(password)
 
     cursor.execute(
-        "INSERT INTO users (username, email, password_hash, is_disabled) VALUES (%s, %s, %s, %s)",
+        "INSERT INTO users (username, email, password_hash, is_disabled) VALUES (%s, %s, %s, %s);",
         (username, email, password_hash.decode('utf-8'), False,) 
     )
 
@@ -30,13 +26,30 @@ async def create_user(username, email, role, password = None, extra_privileges =
     db_connection.close()
 
     # Setting user role
-    await set_user_role(username, role, extra_privileges)
+    await set_user_role(username, role)
 
     return {"username": username, 
             "password": password,
             "role": role}
 
-async def set_user_role(username, role, extra_privileges = {}):
+async def delete_user(username):
+    try:
+        db_connection = connect_db()
+        cursor = db_connection.cursor()
+    except(Error):
+        print("[Error]: ", Error)
+
+    cursor.execute(
+        "DELETE FROM users WHERE username = %s;", 
+        (username,)
+    )
+
+    db_connection.commit()
+    db_connection.close()
+
+    return {"username": username}
+
+async def set_user_role(username, role):
     try:
         db_connection = connect_db()
         cursor = db_connection.cursor()
@@ -45,8 +58,8 @@ async def set_user_role(username, role, extra_privileges = {}):
 
 
     cursor.execute(
-        "INSERT INTO roles (username, role_name, extra_privileges) VALUES (%s, %s, %s)",
-        (username, role, extra_privileges,)
+        "INSERT INTO roles (username, role_name) VALUES (%s, %s);",
+        (username, role,)
         )
     
     db_connection.commit()
@@ -61,11 +74,29 @@ async def get_user(username):
         print("[Error]: ", Error)
     
     cursor.execute(
-        "SELECT * FROM users WHERE username = %s",
+        "SELECT * FROM users WHERE username = %s;",
         (username,)
     )
 
     data = cursor.fetchone()
+
+    if data == []:
+        return False
+    
+    return data
+
+async def get_users():
+    try:
+        db_connection = connect_db()
+        cursor = db_connection.cursor()
+    except(Error):
+        print("[Error]: ", Error)
+
+    cursor.execute(
+        "SELECT * FROM users;"
+    )
+
+    data = cursor.fetchall()
 
     if data == []:
         return False

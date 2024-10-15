@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from databases.db import create_user, get_user
+from databases.user import create_user, get_user, get_users, delete_user
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
 from cryptography.passwords import compare_password_with_hash
 from api.session import create_new_session, validate_session, delete_session, renew_session
@@ -32,7 +32,6 @@ class User(BaseModel):
     email: str
     role: str
     password: str = None
-    extra_priveleges: dict = {}
 
 @router.post("/v1/auth/token/create")
 async def api_create_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -57,17 +56,10 @@ async def api_revoke_token(credentials: HTTPAuthorizationCredentials = Depends(s
 
     raise HTTPException(status_code=401, detail="Invalid token or session expired")
 
-
-# @router.post("/v1/auth/users")
-# async def list_users():
-#     # тут должна быть бизнес-логика СУБД
-#     return {"message": "Listing users"}
-
 @router.post("/v1/auth/users/create")
-async def api_create_user(user: User):
-    return await create_user(user.username, user.email, user.role, user.password, user.extra_priveleges)
+async def api_create_user(user: User, username: str = Depends(authenticate_user_token)):
+    return await create_user(user.username, user.email, user.role, user.password)
 
-# @router.delete("/v1/auth/users/{user.username}") # TODO: rewrite this correctly
-# async def api_delete_user(user: User):
-#     return {"message": "test"} 
-
+@router.delete("/v1/auth/users/{username}") # TODO: rewrite this correctly
+async def api_delete_user(username: str):
+    return await delete_user(username)
