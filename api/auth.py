@@ -45,8 +45,12 @@ async def api_create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     )
 
 @router.post("/v1/auth/token/renew")
-async def api_renew_token(username: str = Depends(authenticate_user_token)):
-    return {'username': username}
+async def api_renew_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if await validate_session(credentials.credentials):
+        await renew_session(credentials.credentials)
+        return {"message": "Session revoked successfully"}
+    
+    raise HTTPException(status_code=401, detail="Invalid token or session expired")
     
 @router.post("/v1/auth/token/revoke")
 async def api_revoke_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
