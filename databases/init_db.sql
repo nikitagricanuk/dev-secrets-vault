@@ -17,7 +17,8 @@ CREATE TABLE secrets (
 
 CREATE TABLE settings (
     id SERIAL PRIMARY KEY,
-    scope TEXT NOT NULL, -- settings scope, for example global for all users, or user:uid for specific user
+    scope_type TEXT NOT NULL, -- type of scope, for example 'global' or 'user'
+    scope TEXT NOT NULL, -- settings scope, for example global for all users, or uid for specific user
     setting_key TEXT NOT NULL, -- store data in key - value format, like in redis
     setting_value JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -27,7 +28,7 @@ CREATE TABLE settings (
 CREATE TABLE acl (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
-    resource_type TEXT NOT NULL,
+    resource_type TEXT NOT NULL, -- for example 'secret'
     resource_id INT NOT NULL,
     permission TEXT[] NOT NULL, -- for example ('read', 'write')
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
