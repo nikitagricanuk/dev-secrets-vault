@@ -17,10 +17,12 @@ CREATE TABLE secrets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
+    tags TEXT[] NOT NULL, -- for example 'api_key' or 'password'
     secret_data jsonb NOT NULL,
     secret_data_history jsonb,
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    created_by VARCHAR(50) NOT NULL, -- username
     expires_at TIMESTAMP, -- if set, set is_disabled to true
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -33,7 +35,7 @@ CREATE TABLE settings (
     setting_value jsonb NOT NULL,
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    expires_at TIMESTAMP -- if set, set is_disabled to true,
+    expires_at TIMESTAMP, -- if set, set is_disabled to true,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -44,6 +46,6 @@ CREATE TABLE acl (
     permission TEXT[] NOT NULL, -- for example ('read', 'write')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    expires_at TIMESTAMP -- if set, set is_disabled to true,
+    expires_at TIMESTAMP, -- if set, set is_disabled to true,
     updated_at TIMESTAMP DEFAULT NOW()
 );
