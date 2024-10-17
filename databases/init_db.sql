@@ -18,7 +18,11 @@ CREATE TABLE secrets (
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
     secret_data jsonb NOT NULL,
-    secret_data_history jsonb
+    secret_data_history jsonb,
+    is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    expires_at TIMESTAMP, -- if set, set is_disabled to true
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE settings (
@@ -27,7 +31,9 @@ CREATE TABLE settings (
     scope UUID, -- settings scope, only use if scope_type is anything but global
     setting_key TEXT NOT NULL, -- store data in key - value format, like in redis
     setting_value jsonb NOT NULL,
+    is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP -- if set, set is_disabled to true,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -36,6 +42,8 @@ CREATE TABLE acl (
     resource_type TEXT NOT NULL, -- for example 'secret'
     resource_id INT NOT NULL,
     permission TEXT[] NOT NULL, -- for example ('read', 'write')
+    is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    expires_at TIMESTAMP -- if set, set is_disabled to true,
     updated_at TIMESTAMP DEFAULT NOW()
 );
