@@ -2,7 +2,7 @@ from . import connect_db
 from psycopg2 import Error
 import json
 
-async def create_new_secret(name: str, secret_data: dict, description: str = None):
+async def create_secret(name: str, secret_data: dict, description: str = None):
     try:
         db_connection = connect_db()
         cursor = db_connection.cursor()
