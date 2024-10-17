@@ -1,8 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(60) NOT NULL,
     roles TEXT[] UNIQUE NOT NULL, -- roles the user belongs to, for example ('admin', 'dev', 'sysadmin')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     expires_at TIMESTAMP, -- if set, set is_disabled to true
@@ -11,7 +13,9 @@ CREATE TABLE users (
 );
 
 CREATE TABLE secrets (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT,
     secret_data jsonb NOT NULL
 );
 
@@ -27,7 +31,6 @@ CREATE TABLE settings (
 
 CREATE TABLE acl (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
     resource_type TEXT NOT NULL, -- for example 'secret'
     resource_id INT NOT NULL,
     permission TEXT[] NOT NULL, -- for example ('read', 'write')
