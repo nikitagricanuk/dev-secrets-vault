@@ -22,7 +22,7 @@ CREATE TABLE secrets (
 CREATE TABLE settings (
     id SERIAL PRIMARY KEY,
     scope_type TEXT NOT NULL, -- type of scope, for example 'global' or 'user'
-    scope TEXT NOT NULL, -- settings scope, for example global for all users, or uid for specific user
+    scope UUID, -- settings scope, only use if scope_type is anything but global
     setting_key TEXT NOT NULL, -- store data in key - value format, like in redis
     setting_value JSONB NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
