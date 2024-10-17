@@ -22,7 +22,7 @@ CREATE TABLE secrets (
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     expires_at TIMESTAMP, -- if set, set is_disabled to true
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE settings (
@@ -32,9 +32,9 @@ CREATE TABLE settings (
     setting_key TEXT NOT NULL, -- store data in key - value format, like in redis
     setting_value jsonb NOT NULL,
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMP -- if set, set is_disabled to true,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE acl (
