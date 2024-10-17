@@ -20,7 +20,7 @@ jobs:
 
     - name: Copy files to server
       run: |
-        rsync -avz --exclude='.git' --exclude='.github' -e "ssh -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:$HOME/app/
+        rsync -avz --exclude='.git' --exclude='.github' -e "ssh -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/git-vault/app/
 
     - name: Run docker-compose on server
       run: |
