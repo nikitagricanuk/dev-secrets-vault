@@ -17,5 +17,6 @@ CREATE TABLE roles (
 CREATE TABLE secrets (
     id SERIAL PRIMARY KEY,
     group VARCHAR(255) NOT NULL,
-    sectet_data jsonb NOT NULL
+    sectet_data jsonb NOT NULL, 
+    secret_history jsonb
 );
