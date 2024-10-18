@@ -28,7 +28,7 @@ CREATE TABLE secrets (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE settings (
+CREATE TABLE security_settings (
     id SERIAL PRIMARY KEY,
     scope_type TEXT NOT NULL, -- type of scope, for example 'global' or 'user'
     scope UUID, -- settings scope, only use if scope_type is anything but global
