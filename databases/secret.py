@@ -53,10 +53,12 @@ async def create_secret(name: str, secret_data: dict, tags: dict, username: str,
     }
     return JSONResponse(content=return_data)
 
-async def get_secret(secret_id: str, secret_name: str):
+async def get_secret(secret_id: str = None, secret_name: str = None):
     """
     Returns secret data in json, deserialization needed
     """
+    if secret_id is None and secret_name is None:
+        return False
     try:
         db_connection = connect_db()
         cursor = db_connection.cursor()
@@ -64,10 +66,94 @@ async def get_secret(secret_id: str, secret_name: str):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "SELECT * FROM secrets WHERE id = %s OR name = %s", 
+        "SELECT * FROM secrets WHERE id = %s OR name = %s;", 
         (secret_id, secret_name,)
     )
 
-    secret_data = cursor.fetchone()
+    response_secret_data = cursor.fetchone()
+    
+    secret_id = response_secret_data[0]
+    secret_canonical = response_secret_data[1]
+    secret_description = response_secret_data[2]
+    secret_tags = response_secret_data[3]
+    secret_data = response_secret_data[4]
+    secret_data_sha256 = response_secret_data[6]
+    secret_disabled = response_secret_data[7]
 
-    return secret_data
+    secret_created_at = response_secret_data[8].isoformat()
+    secret_created_at_timestamp = response_secret_data[8].timestamp()
+
+    secret_created_by = response_secret_data[9]
+
+    secret_expires_at = response_secret_data[10].isoformat()
+    secret_expires_at_timestamp = response_secret_data[10].timestamp()
+
+    secret_updated_at = response_secret_data[11].isoformat()
+    secret_updated_at_timestamp = response_secret_data[11].timestamp()
+
+    return_data = {
+        "id": secret_id,
+        "canonical": secret_canonical,
+        "data": secret_data,
+        "sha256": secret_data_sha256,
+        "tags": secret_tags,
+        "is_disabled": secret_disabled,
+        "description": secret_description,
+        "created_by": secret_created_by,
+        "created_at_timestamp": secret_created_at_timestamp,
+        "created_at_utc": secret_created_at,
+        "updated_at_timestamp": secret_updated_at_timestamp,
+        "updated_at_utc": secret_updated_at,
+        "expires_at_timestamp": secret_expires_at_timestamp,
+        "expires_at_utc": secret_expires_at,
+        "ttl": secret_expires_at_timestamp - secret_created_at_timestamp
+    }
+    return JSONResponse(content=return_data)
+
+async def get_secret_list():
+    try:
+        db_connection = connect_db()
+        cursor = db_connection.cursor()
+    except(Error):
+        print("[Error]: ", Error)
+
+    cursor.execute(
+        "SELECT * FROM secrets;"
+    )
+
+    response_secret_data = cursor.fetchall()
+
+    return_data = []
+    for i in range(0, len(response_secret_data)):
+        secret_id = response_secret_data[i][0]
+        secret_name = response_secret_data[i][1]
+        secret_description = response_secret_data[i][2]
+        secret_tags = response_secret_data[i][3]
+        secret_disabled = response_secret_data[i][7]
+
+        secret_created_at = response_secret_data[i][8].isoformat()
+        secret_created_at_timestamp = response_secret_data[i][8].timestamp()
+
+        secret_created_by = response_secret_data[i][9]
+
+        secret_expires_at = response_secret_data[i][10].isoformat()
+        secret_expires_at_timestamp = response_secret_data[i][10].timestamp()
+
+        return_data_secret = {
+            "id": secret_id,
+            "canonical": secret_name,
+            "tags": secret_tags,
+            "is_disabled": secret_disabled,
+            "description": secret_description,
+            "created_by": secret_created_by,
+            "created_at_timestamp": secret_created_at_timestamp,
+            "created_at_utc": secret_created_at,
+            "expires_at_timestamp": secret_expires_at_timestamp,
+            "expires_at_utc": secret_expires_at,
+            "ttl": secret_expires_at_timestamp - secret_created_at_timestamp
+        }
+
+        return_data.append(return_data_secret)
+
+    print(return_data)
+    return JSONResponse(content=return_data)
