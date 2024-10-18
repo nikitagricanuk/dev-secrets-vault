@@ -66,7 +66,7 @@ async def set_user_role(username, role):
     db_connection.close()
 
 
-async def get_user(username):
+async def get_user(username, uuid = None):
     try:
         db_connection = connect_db()
         cursor = db_connection.cursor()
@@ -74,8 +74,8 @@ async def get_user(username):
         print("[Error]: ", Error)
     
     cursor.execute(
-        "SELECT * FROM users WHERE username = %s;",
-        (username,)
+        "SELECT * FROM users WHERE username = %s OR id = %s;",
+        (username, uuid,)
     )
 
     data = cursor.fetchone()
