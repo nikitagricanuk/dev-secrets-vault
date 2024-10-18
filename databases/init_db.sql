@@ -20,6 +20,7 @@ CREATE TABLE secrets (
     tags TEXT[] NOT NULL, -- for example 'api_key' or 'password'
     secret_data jsonb NOT NULL,
     secret_data_history jsonb,
+    secret_data_hashsum TEXT,
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     created_by VARCHAR(50) NOT NULL, -- username
