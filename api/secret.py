@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from .auth import authenticate_user_token
-from databases.secret import create_secret, get_secret
+from databases.secret import create_secret, get_secret, get_secret_list
 from typing import List
 
 router = APIRouter()
@@ -20,3 +20,11 @@ async def api_create_secret(secret_data: Secret,
     return await create_secret(secret_data.name, secret_data.data, 
                         secret_data.tags, session_data["username"],
                         secret_data.ttl, secret_data.description)
+
+@router.get("/v1/secrets/{secret_id}")
+async def api_get_secret(secret_id: str, session_data: str = Depends(authenticate_user_token)):
+    return await get_secret(secret_id)
+
+@router.get("/v1/secrets")
+async def api_get_all_secrets(session_data: str = Depends(authenticate_user_token)):
+    return await get_secret_list()
