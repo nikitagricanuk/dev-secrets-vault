@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from pydantic import BaseModel
 from databases.user import create_user, get_user, get_users, delete_user
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
-from cryptography.passwords import compare_password_with_hash
+from security.passwords import compare_password_with_hash
 from api.session import create_new_session, validate_session, delete_session, renew_session, get_session_data
 from config import JWT_SECRET_KEY
 

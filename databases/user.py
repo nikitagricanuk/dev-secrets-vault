@@ -1,6 +1,6 @@
 import fastapi.responses
 from psycopg2 import Error
-from cryptography.passwords import generate_password, generate_password_hash
+from security.passwords import generate_password, generate_password_hash
 from fastapi.responses import JSONResponse
 import time
 from datetime import datetime, timezone, timedelta
