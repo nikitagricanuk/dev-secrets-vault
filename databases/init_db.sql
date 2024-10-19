@@ -5,9 +5,8 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(60) NOT NULL,
-    roles TEXT[] UNIQUE NOT NULL, -- roles the user belongs to, for example ('admin', 'dev', 'sysadmin')
+    roles TEXT[] NOT NULL, -- roles the user belongs to, for example ('admin', 'dev', 'sysadmin')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
-    is_admin BOOLEAN NOT NULL DEFAULT false,
     expires_at TIMESTAMP, -- if set, set is_disabled to true
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW()
