@@ -27,6 +27,14 @@ async def get_all_settings():
     except(Error):
         print("[Error]: ", Error)
 
+    cursor.execute(
+        "SELECT * FROM security_settings;"
+    )
+
+    data = cursor.fetchall()
+
+    return data
+
     
 
 async def get_setting(setting_key: str):
@@ -37,8 +45,12 @@ async def get_setting(setting_key: str):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "SELECT * FROM settings WHERE setting_key = %s;",
+        "SELECT * FROM security_settings WHERE setting_key = %s;",
         (setting_key,)
     )
+
+    data = cursor.fetchone()
+
+    return data
 
     
