@@ -1,13 +1,14 @@
 # Project Documentation
-[Link to the file in Russian](README_RUS.md)
+[Link to the README in Russian](README_RUS.md)
 
 The goal of the project is to develop an alternative solution for secure storage and secret management, functionally similar to HashiCorp Vault. Given the limited choice of such solutions, our project offers a new approach to addressing secret management tasks, without copying existing systems, but by implementing key features using our own methods.
 
 We have developed a secure API for storing, accessing, and managing secrets, with a strong focus on flexibility and performance. The main features include:
 
-• Secret storage with support for TTL (time-to-live) and metadata 
-• Access control management based on sessions and authentication via GitHub • Session system optimization, allowing flexible security policy configuration: IP address binding, one-time tokens, usage limitations on tokens 
-• Integration with Redis for session management and security
+* Secret storage with support for TTL (time-to-live) and metadata 
+* Access control management based on sessions and authentication via GitHub 
+* Session system optimization, allowing flexible security policy configuration: IP address binding, one-time tokens, usage limitations on tokens 
+* Integration with Redis for session management and security
 
 We opted against using ready-made solutions, such as JWT for sessions, in favor of our own system, which allows fine control over token expiration and revocation. This approach enables the project to be tailored to specific use cases, making it suitable for both small and large-scale projects.
 
