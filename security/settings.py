@@ -47,12 +47,9 @@ async def get_setting(setting_key: str):
             for item in section[category]:
                 if setting in item: # Iterate over category items
                     value = item[setting]["value"]
-                    comment = item[setting]["comment"]
-                    return {"setting_key": setting_key, 
-                            "value": value,
-                            "comment": comment}
+                    return value
 
-    return 2
+    return 0
 
 async def set_setting(key: str, value: str):
     if await validate_setting(key, value):
