@@ -22,13 +22,6 @@
                         "value": "false",
                         "comment": "If true, session tokens will be single-use only, meaning they will expire after a single use."
                     }
-                },
-                {
-                    "max_login_attempts": {
-                        "type": "int",
-                        "value": 10,
-                        "comment": "The maximum number of allowed login attempts before locking the account. Set to 0 for unlimited login attempts."
-                    }
                 }
             ]
         },
