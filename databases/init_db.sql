@@ -29,18 +29,6 @@ CREATE TABLE secrets (
     UPDATEd_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE SETtings (
-    id SERIAL PRIMARY KEY,
-    scope_type TEXT NOT NULL, -- type of scope, for example 'global' or 'user'
-    scope UUID, -- SETtings scope, only use IF scope_type is anything but global
-    SETting_key TEXT NOT NULL, -- store data in key - value format, like in redis
-    SETting_value jsonb NOT NULL,
-    is_disabled BOOLEAN NOT NULL DEFAULT false, -- SET IF the account is disabled
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    expires_at TIMESTAMP, -- IF SET, SET is_disabled to true,
-    UPDATEd_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE acl (
     id SERIAL PRIMARY KEY,
     resource_type TEXT NOT NULL, -- for example 'secret'
