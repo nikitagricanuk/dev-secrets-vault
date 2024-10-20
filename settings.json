@@ -1,47 +1,47 @@
 {
-  "settings": [
-    {
-      "auth": [
+    "settings": [
         {
-          "session_bind_ip": {
-            "type": "bool",
-            "value": false,
-            "comment": "If true, session tokens are bound to the user's IP address. If the IP changes, the token becomes invalid."
-          }
+            "auth": [
+                {
+                    "session_bind_ip": {
+                        "type": "bool",
+                        "value": "false",
+                        "comment": "If true, session tokens are bound to the user's IP address. If the IP changes, the token becomes invalid."
+                    }
+                },
+                {
+                    "session_ttl": {
+                        "type": "int",
+                        "value": 3600,
+                        "comment": "The time-to-live (TTL) for a session token, in seconds. After this period, the session token will expire."
+                    }
+                },
+                {
+                    "otp_session_token": {
+                        "type": "bool",
+                        "value": "false",
+                        "comment": "If true, session tokens will be single-use only, meaning they will expire after a single use."
+                    }
+                },
+                {
+                    "max_login_attempts": {
+                        "type": "int",
+                        "value": 10,
+                        "comment": "The maximum number of allowed login attempts before locking the account. Set to 0 for unlimited login attempts."
+                    }
+                }
+            ]
         },
         {
-          "session_ttl": {
-            "type": "int",
-            "value": 3600,
-            "comment": "The time-to-live (TTL) for a session token, in seconds. After this period, the session token will expire."
-          }
-        },
-        {
-          "otp_session_token": {
-            "type": "bool",
-            "value": false,
-            "comment": "If true, session tokens will be single-use only, meaning they will expire after a single use."
-          }
-        },
-        {
-          "max_login_attempts": {
-            "type": "int",
-            "value": 10,
-            "comment": "The maximum number of allowed login attempts before locking the account. Set to 0 for unlimited login attempts."
-          }
+            "security": [
+                {
+                    "https_only": {
+                        "type": "bool",
+                        "value": "false",
+                        "comment": "If true, the application will only be accessible over HTTPS, enhancing security by encrypting all communications."
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      "security": [
-        {
-          "https_only": {
-            "type": "bool",
-            "value": false,
-            "comment": "If true, the application will only be accessible over HTTPS, enhancing security by encrypting all communications."
-          }
-        }
-      ]
-    }
-  ]
+    ]
 }
