@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from .auth import authenticate_user_token
-from databases.secret import create_secret, get_secret, get_secret_list
+from databases.secret import create_secret, get_secret, get_secret_list, delete_secret
 from typing import List
 
 router = APIRouter()
@@ -28,3 +28,7 @@ async def api_get_secret(secret_id: str, session_data: str = Depends(authenticat
 @router.get("/v1/secrets")
 async def api_get_all_secrets(session_data: str = Depends(authenticate_user_token)):
     return await get_secret_list()
+
+@router.delete("/v1/secrets/{secret_id}")
+async def api_delete_secret(secret_id: str, session_data: str = Depends(authenticate_user_token)):
+    return await delete_secret(secret_id)
