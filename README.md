@@ -1,41 +1,43 @@
-# Документация к проекту 
+# Project Documentation
+[Link to the file in Russian](README_RUS.md)
 
-Цель проекта — разработка альтернативного решения для безопасного хранения и управления секретами, функционально аналогичного HashiCorp Vault. В условиях ограниченного выбора подобных решений, наш проект предлагает новый подход к решению задач управления секретами, не копируя существующие системы, а реализуя ключевые возможности собственными методами.
+The goal of the project is to develop an alternative solution for secure storage and secret management, functionally similar to HashiCorp Vault. Given the limited choice of such solutions, our project offers a new approach to addressing secret management tasks, without copying existing systems, but by implementing key features using our own methods.
 
-Мы создали безопасное API для хранения, доступа и управления секретами, уделяя особое внимание гибкости и производительности. Основные функции включают:
+We have developed a secure API for storing, accessing, and managing secrets, with a strong focus on flexibility and performance. The main features include:
 
- • Хранение секретов с поддержкой TTL (времени жизни) и метаданных
- • Управление правами доступа на основе сессий и аутентификации через GitHub
- • Оптимизация системы сессий, позволяющая гибко настраивать политику безопасности: привязка к IP-адресам, одноразовые токены, ограничения на количество использований токенов
- • Интеграция с Redis для управления сессиями и их безопасностью
+• Secret storage with support for TTL (time-to-live) and metadata 
+• Access control management based on sessions and authentication via GitHub • Session system optimization, allowing flexible security policy configuration: IP address binding, one-time tokens, usage limitations on tokens 
+• Integration with Redis for session management and security
 
-Мы отказались от использования готовых решений, таких как JWT для сессий, в пользу собственной системы, которая позволяет тонко контролировать срок действия и отзыв токенов. Это позволяет адаптировать проект под нужды конкретных сценариев использования, делая его удобным как для малых, так и для масштабных проектов.
+We opted against using ready-made solutions, such as JWT for sessions, in favor of our own system, which allows fine control over token expiration and revocation. This approach enables the project to be tailored to specific use cases, making it suitable for both small and large-scale projects.
 
-Проект также ориентирован на безопасность и защиту данных, с проверкой HTTPS-соединений для всех запросов.
+The project is also focused on security and data protection, with HTTPS connection verification for all requests.
 
 ## POST /v1/auth/token/create
-**Описание:**  запроса на получение токена доступа с типом авторизации по паролю.
+**Description:**  Request to obtain an access token using password-based authentication.
 
-**Метод:**  POST
+**Method:**  POST
 
 **URL:**  /api/v1/token/create 
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:** 
+| Parameter      	| Type   	| Description	|
 |---------------	|--------	|----------	|
-| grant_type    	| string 	|      Тип авторизации	|
-| username      	| string 	|      Имя пользователя    	|
-| passwor       	| string 	|     Пароль пользователя     	|
-| scope         	| string 	|     Запрос на доступ      	|
-| client_id     	| string 	|  Идентификатор клиента        	|
-| client_secret 	| string 	|   Секрет клиента       	|
+| grant_type    	| string 	|      	Type of authorization	|
+| username      	| string 	|      Username   	|
+| passwor       	| string 	|     User's password     	|
+| scope         	| string 	|     Access scope      	|
+| client_id     	| string 	|  	Client identifier       	|
+| client_secret 	| string 	|   Client secret    	|
 
-**Ответ:**
-* Код ответа: 200
+
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-* Код ответа: 422
+* Response Code: 422
   ```json
         {
         "detail": [
@@ -49,116 +51,120 @@
             }
           ]
         }
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+**Server Responses:**
+|  Response Code  	| Description	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешное получение токена доступа       	|   	|
-| 422        	|  Есть логическая ошибка        	|   	|
+| 200        	|   Successful Access Token Retrieval      	|   	|
+| 422        	|  There is a logical error      	|   	|
 
-**Пример запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## POST /v1/token/renew
 
-**Описание:**  обновление токена доступа
+**Description:**  access token update
 
-**Метод:**  POST
+**Method:**   POST
 
 **URL:**  /api/v1/token/renew 
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:**  
+| Parameter         	|Type    	| Description	|
 |---------------	|--------	|----------	|
-| refresh_token 	| string 	|      Токен обновления для получения нового токена доступа	|
+| refresh_token 	| string 	|     Refresh Token for Obtaining a New Access Token	|
+**Response:**
 
-**Ответ:**
-* Код ответа: 200
+* Response Code: 200
   ```json
   "string"
   ```
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+
+**Server Responses:**
+|  Response Code  	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешное обновление токена доступа         	|   	|
+| 200        	|   Successful Access Token Update        	|   	|
 
-**Пример запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## POST /v1/token/revoke
-**Описание:**  запрос на отзыв токена доступа или токена обновления.
+**Description:**  request to revoke access token or refresh token
 
-**Метод:**  POST
+**Method:**   POST
 
 **URL:**  /api/v1/token/revoke
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:** 
+|Parameter       	| Type   	| Description	|
 |---------------	|--------	|----------	|
-| revoke_token 	| string 	|  Токен доступа или обновления, который нужно отозвать
+| revoke_token 	| string 	|  Access Token or Refresh Token to Be Revoked
 
-**Ответ:**
-* Код ответа: 200
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+
+**Server Responses:**
+|  Response Code  	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешное        отзыв токена доступа или токена обновления 	|   	|
+| 200        	|  Successful Revocation of Access Token or Refresh Token	|   	|
 
-**Привер запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## POST /v1/users/create 
 
-**Описание:**  запроса на созданиe нового пользователя в системе.
+**Description:** request to create a new user in the system
 
-**Метод:**  POST
+**Method:**   POST
 
 **URL:**  /api/v1/token/create 
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:**  
+| Parameter        	| Type   	| Description 	|
 |---------------	|--------	|----------	|
-| username    	| string 	|    	Имя пользователя	|
-| email      	| string 	|     Электронная почта пользователя    	|
-| role       	| string 	|     Роль пользователя      	|
-| password      	| string 	|     Пароль пользователя     	|
+| username    	| string 	|    Username |
+| email      	| string 	|     User Email   	|
+| role       	| string 	|     User Role   	|
+| password      	| string 	|     User Password    	|
 
 
-**Ответ:**
-* Код ответа: 200
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-* Код ответа: 422
+* Response Code: 422
   ```json
     {
          "detail": [
@@ -172,43 +178,43 @@ ___
             }
        ]
     }
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+**Server Responses:**
+|  Response Code а 	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|  Пользователь успешно создан       	|   	|
-| 422        	|  Есть логическая ошибка        	|   	|
+| 200        	|  User Created Successfully       	|   	|
+| 422        	|  There is a logical error       	|   	|
 
-**Пример запроса:**
+**Example Request:**
 
-Запрос:
-
+Request:
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## POST /v1/users/{username}/delete
 
-**Описание:**  удаление пользователя. 
+**Description:**  user deletion 
 
-**Метод:**  POST
+**Method:**   POST
 
 **URL:**  /api/v1/users/delete
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:** 
+| Parameter        	| Type   	| Description 	|
 |---------------	|--------	|----------	|
-| username    	| string 	|    	Имя удаляемого пользователя	|
+| username    	| string 	|    	Name of the User to be Deleted	|
 
-**Ответ:**
-* Код ответа: 200
+***Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-* Код ответа: 422
+* Response Code: 422
   ```json
     {
          "detail": [
@@ -222,37 +228,37 @@ ___
             }
        ]
     }
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+**Server Responses:**
+|  Response Code 	| Description	|   	|
 |------------	|----------	|---	|
-| 200        	|  Успешное удаление  пользователя   	|   	|
-| 422        	|  Есть логическая ошибка        	|   	|
+| 200        	|  Successful User Deletion  	|   	|
+| 422        	|  There is a logical error        	|   	|
+**Example Request:**
 
-**Пример запроса:**
-
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## POST /v1/secrets/create
-**Описание:**  запрос на  создание нового секрета в системе.
+**Description:** request to create a new secret in the system
 
-**Метод:**  POST
+**Method:**   POST
 
 **URL:**  /api/v1/secrets/create
 
-**Ответ:**
-* Код ответа: 200
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-* Код ответа: 422
+* Response Code: 422
   ```json
     {
          "detail": [
@@ -266,19 +272,19 @@ ___
             }
        ]
     }
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+**Server Responses:**
+|  Response Code  	| Description	|   	|
 |------------	|----------	|---	|
-| 200        	|  Успешное создание секрета    	|   	|
-| 422        	|  Есть логическая ошибка        	|   	|
-**Привер запроса:**
+| 200        	|  Successful Creation of Secret    	|   	|
+| 422        	|  There is a logical error        	|   	|
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
@@ -286,23 +292,24 @@ ___
 
 ## GET /v1/secrets/{secret_id}
 
-**Описание:**  получение информации о конкретном секрете. 
+**Description:** retrieval of information about a specific secret
 
-**Метод:**  GET
+**Method:**   GET
 
 **URL:**  /api/v1/secrets
 
-**Параметры запроса:** 
-| Параметр      	| Тип    	| Описание 	|
+**Request Parameters:** 
+| Parameter        	| Type   	| Description 	|
 |---------------	|--------	|----------	|
-| secret_id    	| string 	|    Идентификатор секрета     	|
+| secret_id    	| string 	|    Secret Identifier    	|
 
-**Ответ:**
-* Код ответа: 200
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-* Код ответа: 422
+* Response Code: 422
   ```json
     {
          "detail": [
@@ -316,111 +323,159 @@ ___
             }
        ]
     }
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+**Server Responses:**
+|  Response Code 	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|  Успешное получение информации о секрете  	|   	|
-| 422        	|  Есть логическая ошибка        	|   	|
+| 200        	|  Successful Retrieval of Secret Information  	|   	|
+| 422        	|  There is a logical error       	|   	|
 
-**Пример запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
 ## GET /v1/secrets
-**Описание:**  получение списка секретов.
+**Description:** retrieval of secrets list
 
-**Метод:**  GET
+**Method:**   GET
 
 **URL:**  /api/v1/secrets
 
-**Ответ:**
-* Код ответа: 200
+**Response:**
+
+* Response Code: 200
   ```json
   "string"
   ```
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+
+**Server Responses:**
+|  Response Code  	|Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешное  получение писка секретов|   	|
+| 200        	|   Successful Retrieval of Secrets List|  	|
 
-**Привер запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
-## POST /v1/sys/security
-**Описание:**  запрос на настройки или обновление конфигурации безопасности в системе.
+## GET /v1/sys/settings
+**Description:** retrieves a list of all system settings
 
-**Метод:**  POST
+**Method:**   GET
 
-**URL:**  /api/v1/sys/security
+**URL:**  /api/v1/sys/settings
 
-**Параметры запроса:** 
+**Response:**
 
-**Ответ:**
-* Код ответа: 200
+* Response Code: 200
   ```json
   "string"
   ```
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+
+**Server Responses:**
+|  Response Code 	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешная настройка или обновление 
+| 200        	|  Successful Retrieval of Secret Information  	|   	|
 
-**Привер запроса:**
 
-Запрос:
+**Example Request:**
+
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
 ```json
 
 ```
 ___
-## POST /v1/sys/auth
-**Описание:**  запрос на настройки или обновление механизма аутентификации в системе.
+## POST /v1/sys/setting
+**Description:** request to create or update a specific system setting
+**Method:**  POST
 
-**Метод:**  POST
+**URL:**   api/v1/sys/setting
 
-**URL:**  /api/v1/sys/auth
+**Example Request:** 
 
-**Параметры запроса:** 
+**Response:**
 
-**Ответ:**
-* Код ответа: 200
+* Response Code: 200
   ```json
   "string"
   ```
-**Ответы сервера:**
-| Код ответа 	| Описание 	|   	|
+
+**Server Responses:**
+| Response Code 	| Description 	|   	|
 |------------	|----------	|---	|
-| 200        	|   Успешная настройка или обновление 
+| 200        	|  Successful Creation or Update
 
-**Привер запроса:**
+**Example Request:**
 
-Запрос:
+Request:
 
 ```shell
 
 ```
-Ответ:
+Response:
+```json
+
+```
+___
+## GET /v1/sys/setting/{setting_key}
+**Description:**  request to retrieve the value of a specific system setting identified by the provided setting_key
+
+**Method:** GET
+
+**URL:**  /api/v1/sys/setting/{setting_key}
+
+
+**Response:**
+* Response Code: 200
+  ```json
+  "string"
+  ```
+* Response Code: 422
+  ```json
+    {
+         "detail": [
+            {
+             "loc": [
+                "string",
+                 0
+             ],
+            "msg": "string",
+            "type": "string"
+            }
+       ]
+    }
+**Server Responses:**
+|  Response Code 	| Description 	|   	|
+|------------	|----------	|---	|
+| 200        	|  Successful Retrieval of Specific System Setting 	|   	|
+| 422        	|  There is a logical error       	|   	|
+**Example Request:**
+
+Request:
+
+```shell
+
+```
+Response:
 ```json
 
 ```
