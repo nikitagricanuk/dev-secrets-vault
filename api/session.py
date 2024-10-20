@@ -2,13 +2,16 @@ from redis import asyncio as aioredis
 from config import REDIS_HOST, REDIS_PORT
 from datetime import datetime, timezone, timedelta
 from fastapi.responses import JSONResponse
+from security.settings import get_setting
+from utils import str_to_bool
 import uuid
 import time
 import json
 
 redis = aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}", decode_responses=True)
 
-async def create_new_session(username: str, session_ip: str, ttl: int = 3600):
+async def create_new_session(username: str, session_ip: str):
+    ttl = int(await get_setting("auth.session_ttl"))
     sid = str(uuid.uuid4())
     created_at = time.time()
 
@@ -16,7 +19,8 @@ async def create_new_session(username: str, session_ip: str, ttl: int = 3600):
         "username": username,
         "session_id": sid, # including just in case
         "session_ip": session_ip,
-        "created_at": created_at
+        "created_at": created_at,
+        "usage_count": 1
     }
 
     await redis.setex(f"session:{sid}", ttl, json.dumps(session_data)) # serialize session data and insert into redis database
@@ -47,19 +51,27 @@ async def validate_session(sid: str, host_ip: str):
             - 1: Validation successful (session exists, and IP matches).
             - 2: Session does not exist.
             - 3: Session IP does not match the host IP.
+            - 4: OTP is set, session token cannot be used more than once
     """
-    ip_check = True  # TODO: replace with the value from the db
-    session_data = await redis.get(f"session:{sid}")
-    
-    if session_data:
-        if ip_check:
-            session_data = json.loads(session_data)
-            session_ip = session_data["session_ip"]
+    ip_check = str_to_bool(await get_setting("auth.session_bind_ip"))
+    token_otp = str_to_bool(await get_setting("auth.otp_session_token"))
 
+    session_data = await redis.get(f"session:{sid}")
+    if session_data:
+        session_data = json.loads(session_data) 
+        usage_count = session_data["usage_count"]
+
+        if (token_otp is True) and (usage_count >= 1):
+            return 4  # Token used more than once (OTP should only be used once)
+
+        usage_count += 1  # Now we increment the usage count since the session exists
+
+        if ip_check:
+            session_ip = session_data["session_ip"]
             if host_ip == session_ip:
-                return 1  # All good
+                return 1  # All good (IP matches)
             else:
-                return 3  # Session IP doesn't match with host IP
+                return 3  # IP doesn't match
         else:
             return 1  # All good (no IP check)
     else:
