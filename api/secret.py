@@ -37,7 +37,6 @@ async def api_delete_secret(secret_id: str, session_data: str = Depends(authenti
 
 @router.post("/v1/secrets/update/{secret_id}")
 async def api_secret_update(secret_id: str, secret_data: Secret, session_data: str = Depends(authenticate_user_token)):
-    return await update_secret(secret_id, secret_data.name, secret_data.data, 
+    return await upadte_secret(secret_id, secret_data.name, secret_data.data, 
                         secret_data.tags, session_data["username"],
-                        secret_data.ttl, secret_data.description,
-                        session_data=session_data, action='update', resource_id=secret_id)
+                        secret_data.ttl, secret_data.description)
