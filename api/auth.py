@@ -32,7 +32,7 @@ async def authenticate_user_token(request: Request, credentials: HTTPAuthorizati
 class User(BaseModel):
     username: str
     email: str
-    role: str
+    roles: list
     password: str = None
 
 @router.post("/v1/auth/token/create")
@@ -56,7 +56,7 @@ async def api_revoke_token(session_data: str = Depends(authenticate_user_token))
 
 @router.post("/v1/auth/users/create")
 async def api_create_user(user: User, session_data: str = Depends(authenticate_user_token)):
-    return await create_user(user.username, user.email, user.role, user.password)
+    return await create_user(user.username, user.email, user.roles, False, None, user.password)
 
 @router.delete("/v1/auth/users/{username}")
 async def api_delete_user(username: str, session_data: str = Depends(authenticate_user_token)):
