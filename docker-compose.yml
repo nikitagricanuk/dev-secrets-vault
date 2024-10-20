@@ -5,6 +5,8 @@ services:
       context: .
     ports:
       - 8000:8000
+    volumes:
+      - ${PWD}/settings.json:/app/settings.json
     restart: always
 
   postgres:

@@ -157,3 +157,21 @@ async def get_secret_list():
 
     print(return_data)
     return JSONResponse(content=return_data)
+
+async def delete_secret(id: str):
+    try:
+        db_connection = connect_db()
+        cursor = db_connection.cursor()
+    except(Error):
+        print("[Error]: ", Error)
+
+    cursor.execute(
+        "DELETE FROM secrets WHERE id = %s;", 
+        (id,)
+    )
+
+    db_connection.commit()
+    db_connection.close()
+
+    return_data =  {"id": id}
+    return JSONResponse(content=return_data)

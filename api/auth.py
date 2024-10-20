@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from pydantic import BaseModel
 from databases.user import create_user, get_user, get_users, delete_user
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
-from cryptography.passwords import compare_password_with_hash
+from security.passwords import compare_password_with_hash
 from api.session import create_new_session, validate_session, delete_session, renew_session, get_session_data
-from config import JWT_SECRET_KEY
 
 router = APIRouter()
 
@@ -33,7 +32,7 @@ async def authenticate_user_token(request: Request, credentials: HTTPAuthorizati
 class User(BaseModel):
     username: str
     email: str
-    role: str
+    roles: list
     password: str = None
 
 @router.post("/v1/auth/token/create")
@@ -57,7 +56,7 @@ async def api_revoke_token(session_data: str = Depends(authenticate_user_token))
 
 @router.post("/v1/auth/users/create")
 async def api_create_user(user: User, session_data: str = Depends(authenticate_user_token)):
-    return await create_user(user.username, user.email, user.role, user.password)
+    return await create_user(user.username, user.email, user.roles, False, None, user.password)
 
 @router.delete("/v1/auth/users/{username}")
 async def api_delete_user(username: str, session_data: str = Depends(authenticate_user_token)):
