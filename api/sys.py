@@ -10,7 +10,7 @@ class Setting(BaseModel):
     value: str
 
 @router.get("/v1/sys/settings")
-async def api_set_settings_list(session_data: str = Depends(authenticate_user_token)):
+async def api_get_settings_list(session_data: str = Depends(authenticate_user_token)):
     return await get_settings_list()
 
 @router.get("/v1/sys/settings/{setting_key}")
