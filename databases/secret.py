@@ -175,3 +175,32 @@ async def delete_secret(id: str):
 
     return_data =  {"id": id}
     return JSONResponse(content=return_data)
+
+async def upadte_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
+    if secret_id is None and secret_name is None:
+        return False
+    try:
+        db_connection = connect_db()
+        cursor = db_connection.cursor()
+    except(Error):
+        print("[Error]: ", Error)
+
+    expires_at_timestamp = None
+    # Calculate expires_at_timestamp based on ttl
+    if ttl is not None:
+        # Convert ttl (seconds) to a future timestamp
+        expires_at_timestamp = datetime.fromtimestamp(time.time() + ttl).isoformat()
+
+    serialized_secret_data = json.dumps(secret_data)
+
+    cursor.execute(
+        """
+        select update_secret(%s :: UUID,%s :: VARCHAR(50), %s :: TEXT, %s :: TEXT[],
+            %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP, %s :: TEXT[]);
+        """,
+        (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp, permission)
+    )
+
+    secret_updated = cursor.fetchone()[0]
+
+    return JSONResponse(content=secret_updated)
