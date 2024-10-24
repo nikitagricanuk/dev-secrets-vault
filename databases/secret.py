@@ -168,14 +168,25 @@ async def delete_secret(id: str):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "DELETE FROM secrets WHERE id = %s;", 
+        """
+        DELETE FROM secrets WHERE id = %s
+        RETURNING name;""", 
         (id,)
     )
 
     db_connection.commit()
+
+    secret_canonical = cursor.fetchone()[0]
+
     db_connection.close()
 
-    return_data =  {"id": id}
+    return_data = {
+        "id": id,
+        "canonical": secret_canonical,
+        "deleted_at_timestamp": time.time(),
+        "deleted_at_utc": datetime.fromtimestamp(time.time(), tz=timezone.utc).isoformat()
+    }
+
     return JSONResponse(content=return_data)
 
 @check_permissions
@@ -196,14 +207,35 @@ async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tag
 
     serialized_secret_data = json.dumps(secret_data)
 
-    cursor.execute(
+    try:
+        cursor.execute(
         """
         select update_secret(%s :: UUID,%s :: VARCHAR(50), %s :: TEXT, %s :: TEXT[],
             %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP);
         """,
         (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp)
-    )
+        )
+    except(Error):
+        print("[Error]: ", Error)
 
-    secret_updated = cursor.fetchone()
+    try:
+        secret_updated = cursor.fetchone()
+    except(Error):
+        print("[Error]: ", Error)
 
-    return JSONResponse(content=secret_updated)
+    print(secret_updated)
+
+    return_data_secret = {
+                        "id": secret_id,
+                        "canonical": secret_name,
+                        "tags": tags,
+                        "is_disabled": False,
+                        "description": description,
+                        "expires_at_timestamp": expires_at_timestamp,
+                        "expires_at_utc": datetime.fromtimestamp(expires_at_timestamp, tz=timezone.utc).isoformat(),
+                        "ttl": ttl
+                        }
+
+    return JSONResponse(content=return_data_secret)
+    
+
