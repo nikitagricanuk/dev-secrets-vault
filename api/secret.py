@@ -23,7 +23,8 @@ async def api_create_secret(secret_data: Secret,
 
 @router.get("/v1/secrets/{secret_id}")
 async def api_get_secret(secret_id: str, session_data: str = Depends(authenticate_user_token)):
-    return await get_secret(secret_id, session_data=session_data, action='read', resource_id=secret_id)
+    # return await get_secret(secret_id, session_data=session_data, action='read', resource_id=secret_id)
+    return await get_secret(secret_id)
 
 @router.get("/v1/secrets")
 async def api_get_all_secrets(session_data: str = Depends(authenticate_user_token)):
@@ -31,7 +32,8 @@ async def api_get_all_secrets(session_data: str = Depends(authenticate_user_toke
 
 @router.delete("/v1/secrets/{secret_id}")
 async def api_delete_secret(secret_id: str, session_data: str = Depends(authenticate_user_token)):
-    return await delete_secret(secret_id, session_data=session_data, action='delete', resource_id=secret_id)
+    # return await delete_secret(secret_id, session_data=session_data, action='delete', resource_id=secret_id)
+    return await delete_secret(secret_id)
 
 @router.post("/v1/secrets/update/{secret_id}")
 async def api_secret_update(secret_id: str, secret_data: Secret, session_data: str = Depends(authenticate_user_token)):

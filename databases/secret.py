@@ -53,7 +53,7 @@ async def create_secret(name: str, secret_data: dict, tags: dict, username: str,
     }
     return JSONResponse(content=return_data)
 
-@check_permissions
+#@check_permissions
 async def get_secret(secret_id: str = None, secret_name: str = None):
     """
     Returns secret data in json, deserialization needed
@@ -67,7 +67,7 @@ async def get_secret(secret_id: str = None, secret_name: str = None):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "select get_secret(%s, %s);", 
+        "SELECT * FROM secrets WHERE secrets.id = %s OR secrets.name = %s;", 
         (secret_id, secret_name,)
     )
 
@@ -159,7 +159,7 @@ async def get_secret_list():
     print(return_data)
     return JSONResponse(content=return_data)
 
-@check_permissions
+# @check_permissions
 async def delete_secret(id: str):
     try:
         db_connection = connect_db()
@@ -189,7 +189,7 @@ async def delete_secret(id: str):
 
     return JSONResponse(content=return_data)
 
-@check_permissions
+# @check_permissions
 async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     if secret_id is None and secret_name is None:
         return False
