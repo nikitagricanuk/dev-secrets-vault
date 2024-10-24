@@ -1,18 +1,71 @@
-# Project Documentation
+# Vault
 [Link to the README in Russian](README_RUS.md)
 
-The goal of the project is to develop an alternative solution for secure storage and secret management, functionally similar to HashiCorp Vault. Given the limited choice of such solutions, our project offers a new approach to addressing secret management tasks, without copying existing systems, but by implementing key features using our own methods.
+The goal of this project is to develop an alternative solution for secure secret storage and management, functionally similar to HashiCorp Vault. Given the limited number of solutions in this space, our project offers a new approach to solving secret management challenges, not by copying existing systems, but by implementing key features with our own methods.
 
-We have developed a secure API for storing, accessing, and managing secrets, with a strong focus on flexibility and performance. The main features include:
+We have created a secure API for storing, accessing, and managing secrets. The main features include:
 
-* Secret storage with support for TTL (time-to-live) and metadata 
-* Access control management based on sessions and authentication via GitHub 
-* Session system optimization, allowing flexible security policy configuration: IP address binding, one-time tokens, usage limitations on tokens 
+* Secret storage with encryption support
+* Custom implementation of session tokens with TTL and user data retention
+* Optimized session management system allowing flexible security policies: IP address binding, one-time tokens
 * Integration with Redis for session management and security
+* Flexible configuration storage: all settings are stored in JSON format, allowing edits through API requests or manually
 
-We opted against using ready-made solutions, such as JWT for sessions, in favor of our own system, which allows fine control over token expiration and revocation. This approach enables the project to be tailored to specific use cases, making it suitable for both small and large-scale projects.
+We chose not to use ready-made solutions like JWT for sessions in favor of our own system, which allows fine control over token expiration and revocation. This makes the project adaptable to specific use cases, suitable for both small and large-scale projects.
 
-The project is also focused on security and data protection, with HTTPS connection verification for all requests.
+The project is also focused on security and data protection, with HTTPS connection checks for all requests.
+
+## Table of Contents
+1. [Installation](#installation)
+2. [Demo](#demo)
+3. [API Documentation](#api-documentation)
+
+## Installation
+
+1. Ensure you have Docker and Docker Compose installed. If not, install Docker by following the official guides:  
+   [Docker installation](https://docs.docker.com/get-docker/)  
+   [Docker Compose installation](https://docs.docker.com/compose/install/)
+
+2. Clone the project repository:
+    ```bash
+    git clone https://github.com/nikitagricanuk/dev-secrets-vault 
+    ```
+
+3. Navigate to the project directory:
+    ```bash
+    cd dev-secrets-vault
+    ```
+
+4. Create a .env file:
+    ```bash
+    cp .env.example .env
+    ```
+
+5. Generate a new password for the database using the pwgen utility:
+    ```bash
+    pwgen 12 -s
+    ```
+
+6. Insert the generated password into the .env file:
+    ```bash
+    1| # Database settings
+    2| DB_NAME="vault"
+    3| DB_HOST="postgres"
+    4| DB_USERNAME="vault"
+    5| DB_PASSWORD="<database password>" <-- insert the password here
+    6| DB_PORT="5432"
+    ```
+
+7. Start the project:
+    ```bash
+    docker compose up -d
+    ```
+
+## Demo
+
+<!-- Insert video demo link -->
+
+# API-Documentation
 
 ## POST /v1/auth/token/create
 **Description:**  Request to obtain an access token using password-based authentication.
