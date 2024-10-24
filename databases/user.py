@@ -56,14 +56,26 @@ async def delete_user(username):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "DELETE FROM users WHERE username = %s;", 
+        """
+        DELETE FROM users 
+        WHERE username = %s
+        RETURNING id;""", 
         (username,)
     )
 
     db_connection.commit()
+
+    uid = cursor.fetchone()[0]
+    
     db_connection.close()
 
-    return {"username": username}
+    return_data =  {"id": uid,
+                    "username": username,
+                    "deleted_at_timestamp": time.time(),
+                    "deleted_at_utc": datetime.fromtimestamp(time.time(), tz=timezone.utc).isoformat(),
+                    }
+
+    return JSONResponse(content=return_data)
 
 async def get_user(username, uuid = None):
     try:
