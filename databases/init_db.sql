@@ -79,7 +79,7 @@ CREATE FUNCTION create_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS UUID
  LANGUAGE plpgsql AS
@@ -122,6 +122,8 @@ BEGIN
   end if;
 
   select permission from acl
+    where acl.username = _username and acl.resource_id = _id and ('read' = ANY(acl.permission)
+    OR 'read_all' = ANY(acl.permission))
     where acl.resource_id = _id and ('read' = ANY(acl.permission)
     or 'read_all' = ANY(acl.permission) or acl.username = _username)
   into _primissions_secret;
@@ -140,7 +142,7 @@ CREATE FUNCTION update_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS BOOLEAN
  LANGUAGE plpgsql AS
