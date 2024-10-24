@@ -71,7 +71,6 @@ CREATE TABLE secret_history (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- name, description, tags, secret_data, created_by, expires_at
 CREATE EXTENSION pgcrypto;
 
 CREATE FUNCTION create_secret(
@@ -79,7 +78,7 @@ CREATE FUNCTION create_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS UUID
  LANGUAGE plpgsql AS
@@ -102,7 +101,7 @@ BEGIN
     values (_name, _description, _tags, _scrypd, _hashsum, _created_by, _expires_at)
   RETURNING id into _id;
   insert into acl (resource_type, resource_id, username, permission)
-    values ('secret', _id, _created_by, '{read, write}');
+    values ('secret', _id, _created_by, '{create, delete, update, read}');
   RETURN _id;
 END
 $$;
@@ -122,7 +121,8 @@ BEGIN
   end if;
 
   select permission from acl
-    where acl.username = _username and acl.resource_id = _id and 'read' = ANY(acl.permission)
+    where acl.username = _username and acl.resource_id = _id and ('read' = ANY(acl.permission)
+    OR 'read_all' = ANY(acl.permission))
   into _primissions_secret;
   
   if _primissions_secret is null then
@@ -139,7 +139,7 @@ CREATE FUNCTION update_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS BOOLEAN
  LANGUAGE plpgsql AS
@@ -155,7 +155,7 @@ BEGIN
   END IF;
   
   select permission from acl
-    where 'write' = ANY(acl.permission) and acl.resource_id = _id and acl.username = _created_by
+    where 'update' = ANY(acl.permission) and acl.resource_id = _id and acl.username = _created_by
   into _primissions_secret;
   
   if _primissions_secret is null then
