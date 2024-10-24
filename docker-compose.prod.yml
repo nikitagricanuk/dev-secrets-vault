@@ -6,7 +6,11 @@ services:
     ports:
       - 8001:8001
     volumes:
+<<<<<<< HEAD
       - ./settings.json:/app/settings.json
+=======
+      - settings.json:/app/settings.json
+>>>>>>> dev
     restart: always
 
   postgres:

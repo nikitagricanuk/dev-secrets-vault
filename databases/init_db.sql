@@ -122,8 +122,11 @@ BEGIN
   end if;
 
   select permission from acl
+<<<<<<< HEAD
     where acl.username = _username and acl.resource_id = _id and ('read' = ANY(acl.permission)
     OR 'read_all' = ANY(acl.permission))
+=======
+>>>>>>> dev
     where acl.resource_id = _id and ('read' = ANY(acl.permission)
     or 'read_all' = ANY(acl.permission) or acl.username = _username)
   into _primissions_secret;

@@ -53,7 +53,11 @@ async def create_secret(name: str, secret_data: dict, tags: dict, username: str,
     }
     return JSONResponse(content=return_data)
 
+<<<<<<< HEAD
 #@check_permissions
+=======
+@check_permissions
+>>>>>>> dev
 async def get_secret(secret_id: str = None, secret_name: str = None):
     """
     Returns secret data in json, deserialization needed
@@ -159,7 +163,11 @@ async def get_secret_list():
     print(return_data)
     return JSONResponse(content=return_data)
 
+<<<<<<< HEAD
 # @check_permissions
+=======
+@check_permissions
+>>>>>>> dev
 async def delete_secret(id: str):
     try:
         db_connection = connect_db()
@@ -180,6 +188,7 @@ async def delete_secret(id: str):
 
     db_connection.close()
 
+<<<<<<< HEAD
     return_data = {
         "id": id,
         "canonical": secret_canonical,
@@ -190,6 +199,12 @@ async def delete_secret(id: str):
     return JSONResponse(content=return_data)
 
 # @check_permissions
+=======
+    return_data =  {"id": id}
+    return JSONResponse(content=return_data)
+
+@check_permissions
+>>>>>>> dev
 async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     if secret_id is None and secret_name is None:
         return False
@@ -207,13 +222,18 @@ async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tag
 
     serialized_secret_data = json.dumps(secret_data)
 
+<<<<<<< HEAD
     try:
         cursor.execute(
+=======
+    cursor.execute(
+>>>>>>> dev
         """
         select update_secret(%s :: UUID,%s :: VARCHAR(50), %s :: TEXT, %s :: TEXT[],
             %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP);
         """,
         (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp)
+<<<<<<< HEAD
         )
     except(Error):
         print("[Error]: ", Error)
@@ -239,3 +259,10 @@ async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tag
     return JSONResponse(content=return_data_secret)
     
 
+=======
+    )
+
+    secret_updated = cursor.fetchone()
+
+    return JSONResponse(content=secret_updated)
+>>>>>>> dev
