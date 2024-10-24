@@ -26,9 +26,8 @@ async def create_secret(name: str, secret_data: dict, tags: dict, username: str,
 
     cursor.execute(
         """
-        INSERT INTO secrets (name, description, tags, secret_data, created_by, expires_at)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        RETURNING id;
+        select create_secret(%s :: VARCHAR(50), %s :: TEXT, %s :: TEXT[],
+            %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP);
         """,
         (name, description, tags, serialized_secret_data, username, expires_at_timestamp,)
     )
@@ -66,7 +65,7 @@ async def get_secret(secret_id: str = None, secret_name: str = None):
         print("[Error]: ", Error)
 
     cursor.execute(
-        "SELECT * FROM secrets WHERE id = %s OR name = %s;", 
+        "select get_secret(%s, %s);", 
         (secret_id, secret_name,)
     )
 
@@ -176,7 +175,7 @@ async def delete_secret(id: str):
     return_data =  {"id": id}
     return JSONResponse(content=return_data)
 
-async def upadte_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
+async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     if secret_id is None and secret_name is None:
         return False
     try:
@@ -196,9 +195,9 @@ async def upadte_secret(secret_id: str, secret_name: str, secret_data: dict, tag
     cursor.execute(
         """
         select update_secret(%s :: UUID,%s :: VARCHAR(50), %s :: TEXT, %s :: TEXT[],
-            %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP, %s :: TEXT[]);
+            %s :: jsonb, %s :: VARCHAR(50), %s :: TIMESTAMP);
         """,
-        (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp, permission)
+        (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp)
     )
 
     secret_updated = cursor.fetchone()[0]
