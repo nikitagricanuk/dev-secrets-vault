@@ -44,10 +44,10 @@ CREATE TABLE settings (
 
 CREATE TABLE acl (
     id SERIAL PRIMARY KEY,
-    resource_type TEXT NOT NULL, -- for example 'secret'
+    resource_type TEXT NOT NULL, -- for example 'secret', 'user'
     resource_id UUID NOT NULL,
     username VARCHAR(50),
-    permission TEXT[] NOT NULL, -- for example ('read', 'write')
+    permission TEXT[] NOT NULL, -- for example ('create', 'delete', 'update', 'read', 'read_all')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     expires_at TIMESTAMP, -- if set, set is_disabled to true,
