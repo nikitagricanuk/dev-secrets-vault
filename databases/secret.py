@@ -176,7 +176,7 @@ async def delete_secret(id: str):
     return_data =  {"id": id}
     return JSONResponse(content=return_data)
 
-async def upadte_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
+async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     if secret_id is None and secret_name is None:
         return False
     try:
