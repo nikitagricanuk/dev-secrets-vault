@@ -79,7 +79,7 @@ CREATE FUNCTION create_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS UUID
  LANGUAGE plpgsql AS
@@ -142,7 +142,7 @@ CREATE FUNCTION update_secret(
     _description TEXT,
     _tags TEXT[],
     _secret_data jsonb,
-    _created_by VARCHAR(50), -- username
+    _created_by VARCHAR(50),
     _expires_at TIMESTAMP
     ) RETURNS BOOLEAN
  LANGUAGE plpgsql AS
