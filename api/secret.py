@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from .auth import authenticate_user_token
 from databases.secret import create_secret, get_secret, get_secret_list, delete_secret, update_secret
+from databases.secret import create_secret, get_secret, get_secret_list, delete_secret, update_secret
 from typing import List
 
 router = APIRouter()

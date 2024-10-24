@@ -7,7 +7,7 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(60) NOT NULL,
-    roles TEXT[] UNIQUE NOT NULL, -- roles the user belongs to, for example ('admin', 'dev', 'sysadmin')
+    roles TEXT[] NOT NULL, -- roles the user belongs to, for example ('admin', 'dev', 'sysadmin')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     is_admin BOOLEAN NOT NULL DEFAULT false,
     expires_at TIMESTAMP, -- if set, set is_disabled to true
@@ -20,8 +20,7 @@ CREATE TABLE secrets (
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
     tags TEXT[] NOT NULL, -- for example 'api_key' or 'password'
-    secret_data TEXT NOT NULL,
-    secret_data_history TEXT,
+    secret_data bytea NOT NULL,
     secret_data_hashsum TEXT,
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
@@ -87,7 +86,7 @@ $$
 DECLARE
    _id UUID;
    _some_key text;
-   _scrypd text;
+   _scrypd bytea;
    _hashsum text;
 BEGIN
   if EXISTS(select crypto_key from userkeys where username = _created_by) then
@@ -96,7 +95,7 @@ BEGIN
     _some_key := gen_random_bytes(16);
     insert into userkeys values (_created_by, _some_key);
   end if;
-  _scrypd := pgp_sym_encrypt(cast(_secret_data as text), _some_key);
+  _scrypd := pgp_sym_encrypt(_secret_data::text, _some_key);
   _hashsum := md5(_scrypd);
   insert into secrets (name, description, tags, secret_data, secret_data_hashsum, created_by, expires_at) 
     values (_name, _description, _tags, _scrypd, _hashsum, _created_by, _expires_at)
@@ -111,22 +110,30 @@ CREATE FUNCTION get_secret(
     _username VARCHAR(50),
     _id UUID DEFAULT uuid_generate_v4(),
     _name VARCHAR(50) DEFAULT ''
-) RETURNS SETOF secrets
+) RETURNS TABLE (
+  id UUID,
+  name VARCHAR(50),
+  description TEXT,
+  tags TEXT[], -- for example 'api_key' or 'password'
+  secret_data text,
+  secret_data_hashsum TEXT,
+  is_disabled BOOLEAN, -- set if the account is disabled
+  created_at TIMESTAMP,
+  created_by VARCHAR(50), -- username
+  expires_at TIMESTAMP,
+  updated_at TIMESTAMP
+)
   LANGUAGE plpgsql AS
 $$
 DECLARE
   _primissions_secret text;
+  _secret_key text;
 BEGIN
   if _id is null then
-    select id from secrets where name = 'noway' into _id;
+    select secrets.id from secrets where secrets.name = 'noway' into _id;
   end if;
 
   select permission from acl
-<<<<<<< HEAD
-    where acl.username = _username and acl.resource_id = _id and ('read' = ANY(acl.permission)
-    OR 'read_all' = ANY(acl.permission))
-=======
->>>>>>> dev
     where acl.resource_id = _id and ('read' = ANY(acl.permission)
     or 'read_all' = ANY(acl.permission) or acl.username = _username)
   into _primissions_secret;
@@ -134,7 +141,9 @@ BEGIN
   if _primissions_secret is null then
     RETURN QUERY SELECT * FROM secrets WHERE secrets.id = uuid_generate_v4();
   else
-    RETURN QUERY SELECT * FROM secrets WHERE secrets.id = _id OR secrets.name = _name;
+    RETURN QUERY SELECT secrets.id, secrets.name, secrets.description, secrets.tags, pgp_sym_decrypt(secrets.secret_data, (select crypto_key from userkeys where username = secrets.created_by)) as secret_data,
+                        secrets.secret_data_hashsum, secrets.is_disabled, secrets.created_at, secrets.created_by, 
+                        secrets.expires_at, secrets.updated_at FROM secrets WHERE secrets.id = _id OR secrets.name = _name;
   end if;
 END;
 $$;
