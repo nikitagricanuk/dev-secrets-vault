@@ -45,8 +45,9 @@ CREATE TABLE settings (
 CREATE TABLE acl (
     id SERIAL PRIMARY KEY,
     resource_type TEXT NOT NULL, -- for example 'secret', 'user'
-    resource_id UUID NOT NULL,
+    resource_id UUID,
     username VARCHAR(50),
+    user_role TEXT,
     permission TEXT[] NOT NULL, -- for example ('create', 'delete', 'update', 'read', 'read_all')
     is_disabled BOOLEAN NOT NULL DEFAULT false, -- set if the account is disabled
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
@@ -121,8 +122,8 @@ BEGIN
   end if;
 
   select permission from acl
-    where acl.username = _username and acl.resource_id = _id and ('read' = ANY(acl.permission)
-    OR 'read_all' = ANY(acl.permission))
+    where acl.resource_id = _id and ('read' = ANY(acl.permission)
+    or 'read_all' = ANY(acl.permission) or acl.username = _username)
   into _primissions_secret;
   
   if _primissions_secret is null then
@@ -155,7 +156,7 @@ BEGIN
   END IF;
   
   select permission from acl
-    where 'update' = ANY(acl.permission) and acl.resource_id = _id and acl.username = _created_by
+    where acl.resource_id = _id and ('update' = ANY(acl.permission) OR acl.username = _created_by)
   into _primissions_secret;
   
   if _primissions_secret is null then

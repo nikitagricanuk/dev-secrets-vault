@@ -6,6 +6,7 @@ import json
 import time
 from datetime import datetime, timezone, timedelta
 from fastapi.responses import JSONResponse
+from databases.acl import check_permissions
 
 async def create_secret(name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     try:
@@ -52,6 +53,7 @@ async def create_secret(name: str, secret_data: dict, tags: dict, username: str,
     }
     return JSONResponse(content=return_data)
 
+@check_permissions
 async def get_secret(secret_id: str = None, secret_name: str = None):
     """
     Returns secret data in json, deserialization needed
@@ -157,6 +159,7 @@ async def get_secret_list():
     print(return_data)
     return JSONResponse(content=return_data)
 
+@check_permissions
 async def delete_secret(id: str):
     try:
         db_connection = connect_db()
@@ -175,6 +178,7 @@ async def delete_secret(id: str):
     return_data =  {"id": id}
     return JSONResponse(content=return_data)
 
+@check_permissions
 async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tags: dict, username: str,  ttl: int = None, description: str = None):
     if secret_id is None and secret_name is None:
         return False
@@ -200,6 +204,6 @@ async def update_secret(secret_id: str, secret_name: str, secret_data: dict, tag
         (secret_id, secret_name, description, tags, serialized_secret_data, username, expires_at_timestamp)
     )
 
-    secret_updated = cursor.fetchone()[0]
+    secret_updated = cursor.fetchone()
 
     return JSONResponse(content=secret_updated)
