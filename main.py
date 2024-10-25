@@ -3,8 +3,10 @@ from api import router
 from security.settings import get_setting
 from utils import str_to_bool
 from fastapi.responses import JSONResponse
+
 app = FastAPI() # initializing fastapi
 
+# HTTPs-only check
 @app.middleware("http")
 async def enforce_https(request: Request, call_next):
     try:
