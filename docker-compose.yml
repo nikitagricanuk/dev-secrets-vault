@@ -6,7 +6,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ${PWD}/settings.json:/app/settings.json
+      - ${PWD}/settings.json:/app/settings.json:rw
     restart: always
 
   postgres:
