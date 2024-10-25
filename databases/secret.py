@@ -145,22 +145,27 @@ async def get_secret_list():
     )
 
     response_secret_data = cursor.fetchall()
-
+    print(response_secret_data)
+    # [('0a795ef8-4d4e-412c-874c-bbac610779f5', 'my_secret', 'This is a secret for API key', 
+    # ['backend', 'devops'], <memory at 0xffff89fa1f00>, '6b3a5e71ce76bcbcf0aba823965c8e62', 
+    # False, datetime.datetime(2024, 10, 25, 10, 15, 35, 405241), 'nikitagricanuk', 
+    # datetime.datetime(2024, 10, 25, 11, 15, 35, 405129), 
+    # datetime.datetime(2024, 10, 25, 10, 15, 35, 405241))]
     return_data = []
     for i in range(0, len(response_secret_data)):
         secret_id = response_secret_data[i][0]
         secret_name = response_secret_data[i][1]
         secret_description = response_secret_data[i][2]
         secret_tags = response_secret_data[i][3]
-        secret_disabled = response_secret_data[i][7]
+        secret_disabled = response_secret_data[i][6]
 
-        secret_created_at = response_secret_data[i][8].isoformat()
-        secret_created_at_timestamp = response_secret_data[i][8].timestamp()
+        secret_created_at = response_secret_data[i][7].isoformat()
+        secret_created_at_timestamp = response_secret_data[i][7].timestamp()
 
-        secret_created_by = response_secret_data[i][9]
+        secret_created_by = response_secret_data[i][8]
 
-        secret_expires_at = response_secret_data[i][10].isoformat()
-        secret_expires_at_timestamp = response_secret_data[i][10].timestamp()
+        secret_expires_at = response_secret_data[i][9].isoformat()
+        secret_expires_at_timestamp = response_secret_data[i][9].timestamp()
 
         return_data_secret = {
             "id": secret_id,
