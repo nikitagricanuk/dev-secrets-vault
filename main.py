@@ -1,10 +1,15 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from api import router
 from config import CORS_ORIGINS_LIST
 from security.settings import get_setting
 from utils import str_to_bool
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+
+from logging_config import setup_logger
+
+logger = setup_logger(__name__)
 
 app = FastAPI() # initializing fastapi
 
@@ -31,8 +36,28 @@ async def enforce_https(request: Request, call_next):
         # Proceed with the normal request flow
         return await call_next(request)
     except Exception as e:
-        # logging.error(f"Error in enforce_https middleware: {e}")
+        logger.error(f"HTTPs enforcing error: {e}")
         return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # Extract error details
+    errors = exc.errors()
+    error_details = [
+        {
+            "loc": error["loc"],  # Location of the error (e.g., body, query, path)
+            "msg": error["msg"],  # Error message
+            "type": error["type"],  # Type of the error (e.g., value_error, type_error)
+        }
+        for error in errors
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation error",
+            "errors": error_details,
+        },
+    )
 
 app.include_router(router)
 
