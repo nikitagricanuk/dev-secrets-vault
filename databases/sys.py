@@ -1,56 +1,47 @@
-from . import connect_db
+from . import connect_db, db_connection
 from psycopg2 import Error
 import json
 
+from logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+@db_connection
 async def create_setting(scope_type: str, scope: str, setting_key: str,
-                             setting_value: str):
+                            setting_value: str, db_connection=None, cursor=None):
     try:
-        db_connection = connect_db()
-        cursor = db_connection.cursor()
-    except(Error):
-        print("[Error]: ", Error)
+        cursor.execute(
+            """
+            INSERT INTO settings (scope_type, scope, setting_key, setting_value) 
+            VALUES (%s, %s, %s, %s);
+            """, (scope_type, scope, setting_key, setting_value,)
+        )
 
-    cursor.execute(
-        """
-        INSERT INTO settings (scope_type, scope, setting_key, setting_value) 
-        VALUES (%s, %s, %s, %s);
-        """, (scope_type, scope, setting_key, setting_value,)
-    )
+        db_connection.commit()
+        
+        logger.info(f"Set setting {setting_key} to {setting_value}")
+    except Exception as e:
+        logger.info(f"Failed to set setting {setting_key} to {setting_value}: {e}")
 
-    db_connection.commit()
-    db_connection.close()
-
-async def get_all_settings():
+@db_connection
+async def get_all_settings(db_connection=None, cursor=None):
     try:
-        db_connection = connect_db()
-        cursor = db_connection.cursor()
-    except(Error):
-        print("[Error]: ", Error)
+        cursor.execute(
+            "SELECT * FROM security_settings;"
+        )
 
-    cursor.execute(
-        "SELECT * FROM security_settings;"
-    )
-
-    data = cursor.fetchall()
-
-    return data
-
+        return cursor.fetchall()
+    except Exception as e:
+        logger.info(f"Failed to fetch settings: {e}")
     
-
-async def get_setting(setting_key: str):
+@db_connection
+async def get_setting(setting_key: str, db_connection=None, cursor=None):
     try:
-        db_connection = connect_db()
-        cursor = db_connection.cursor()
-    except(Error):
-        print("[Error]: ", Error)
+        cursor.execute(
+            "SELECT * FROM security_settings WHERE setting_key = %s;",
+            (setting_key,)
+        )
 
-    cursor.execute(
-        "SELECT * FROM security_settings WHERE setting_key = %s;",
-        (setting_key,)
-    )
-
-    data = cursor.fetchone()
-
-    return data
-
-    
+        return cursor.fetchone()
+    except Exception as e:
+        logger.info(f"Failed to fetch setting {setting_key}: {e}")

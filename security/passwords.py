@@ -22,12 +22,11 @@ async def generate_password(length=12, use_digits=True, use_uppercase=True, use_
         characters += string.ascii_lowercase
     if use_special_chars:
         characters += string.punctuation
-    
+
     if not characters:
         raise ValueError("At least one character set must be enabled.")
 
-    password = ''.join(random.choice(characters) for _ in range(length))
-    return password
+    return ''.join(random.choice(characters) for _ in range(length))
 
 async def generate_password_hash(password = None):
     if password is None:

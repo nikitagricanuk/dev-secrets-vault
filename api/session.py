@@ -8,6 +8,10 @@ import uuid
 import time
 import json
 
+from logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 redis = aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}", decode_responses=True)
 
 async def create_new_session(username: str, session_ip: str):
@@ -25,6 +29,8 @@ async def create_new_session(username: str, session_ip: str):
 
     await redis.setex(f"session:{sid}", ttl, json.dumps(session_data)) # serialize session data and insert into redis database
 
+    logger.info(f"New session has been created successfully and associated with ID {sid}.")
+    
     return_data =  {"session_id": sid, 
                     "session_ip": session_ip,
                     "username": username,
@@ -57,25 +63,20 @@ async def validate_session(sid: str, host_ip: str):
     token_otp = str_to_bool(await get_setting("auth.otp_session_token"))
 
     session_data = await redis.get(f"session:{sid}")
-    if session_data:
-        session_data = json.loads(session_data) 
-        usage_count = session_data["usage_count"]
-
-        if (token_otp is True) and (usage_count >= 1):
-            return 4  # Token used more than once (OTP should only be used once)
-
-        usage_count += 1  # Now we increment the usage count since the session exists
-
-        if ip_check:
-            session_ip = session_data["session_ip"]
-            if host_ip == session_ip:
-                return 1  # All good (IP matches)
-            else:
-                return 3  # IP doesn't match
-        else:
-            return 1  # All good (no IP check)
-    else:
+    if not session_data:
         return 2  # Session doesn't exist
+    session_data = json.loads(session_data)
+    usage_count = session_data["usage_count"]
+
+    if (token_otp is True) and (usage_count >= 1):
+        return 4  # Token used more than once (OTP should only be used once)
+
+    usage_count += 1  # Increment the usage count since the session exists
+
+    if ip_check:
+        return 1 if host_ip == session_data["session_ip"] else 3
+    else:
+        return 1  # All good (no IP check)
 
 async def renew_session(sid: str, ttl: int = 3600):
     if await redis.expire(f"session:{sid}", ttl):
@@ -84,6 +85,8 @@ async def renew_session(sid: str, ttl: int = 3600):
         username = session_data["username"]
         created_at = session_data["created_at"]
         session_ip = session_data["session_ip"]
+        
+        logger.info(f"Session with ID {sid} has been renewed successfully.")
         
         return_data =  {"session_id": sid, 
                         "session_ip": session_ip,
@@ -104,6 +107,8 @@ async def delete_session(sid: str):
     session_ip = old_session_data["session_ip"]
     created_at = old_session_data["created_at"]
     username = old_session_data["username"]
+    
+    logger.info(f"Session with ID {sid} has been deleted successfully.")
     
     return_data =  {"session_id": sid, 
                     "session_ip": session_ip,

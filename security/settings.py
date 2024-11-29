@@ -13,12 +13,14 @@ async def get_settings_list():
     for section in settings["settings"]:
         for category, items in section.items():  # Iterate over categories (e.g., 'auth', 'security')
             for item in items:  # Each item is a setting inside the category
-                for setting_key, setting_data in item.items():  # Access the setting name and its data
-                    settings_list.append({
+                settings_list.extend(
+                    {
                         "setting_key": f"{category}.{setting_key}",  # Format: "category.setting"
                         "value": setting_data["value"],
-                        "comment": setting_data["comment"]
-                    })
+                        "comment": setting_data["comment"],
+                    }
+                    for setting_key, setting_data in item.items()
+                )
     return JSONResponse(content=settings_list)
 
 async def get_setting(setting_key: str):
@@ -46,9 +48,7 @@ async def get_setting(setting_key: str):
         if category in section: # Iterate over categories (e.g., 'auth', 'security')
             for item in section[category]:
                 if setting in item: # Iterate over category items
-                    value = item[setting]["value"]
-                    return value
-
+                    return item[setting]["value"]
     return 0
 
 async def set_setting(key: str, value: str):
