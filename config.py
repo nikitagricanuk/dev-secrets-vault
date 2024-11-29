@@ -20,3 +20,5 @@ PATH_TO_SETTINGS_FILE = os.getenv('PATH_TO_SETTINGS_FILE')
 
 CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost,http://127.0.0.1')
 CORS_ORIGINS_LIST = [origin.strip() for origin in CORS_ORIGINS.split(',') if origin.strip()]
+
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
