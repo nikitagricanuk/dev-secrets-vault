@@ -17,3 +17,6 @@ GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 
 PATH_TO_SETTINGS_FILE = os.getenv('PATH_TO_SETTINGS_FILE')
+
+CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost,http://127.0.0.1')
+CORS_ORIGINS_LIST = [origin.strip() for origin in CORS_ORIGINS.split(',') if origin.strip()]
