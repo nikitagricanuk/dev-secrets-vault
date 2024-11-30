@@ -21,6 +21,16 @@ jobs:
     - name: Copy files to server
       run: |
         rsync -avz --exclude='.git' --exclude='.github' -e "ssh -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/
+    
+    - name: Check and Create Docker Network
+      run: |
+        NETWORK_NAME="vault-network"
+        if ! docker network inspect $NETWORK_NAME >/dev/null 2>&1; then
+          echo "Network $NETWORK_NAME does not exist. Creating it..."
+          docker network create $NETWORK_NAME
+        else
+          echo "Network $NETWORK_NAME already exists. Skipping creation."
+        fi
 
     - name: Run docker compose on server
       run: |

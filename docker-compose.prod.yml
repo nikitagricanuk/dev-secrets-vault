@@ -1,5 +1,5 @@
 services:
-  vault:
+  backend:
     build: 
       dockerfile: Dockerfile.prod.vault
       context: .
@@ -9,6 +9,9 @@ services:
       - ./settings.json:/app/settings.json
     env_file:
       - .env
+    networks:
+      - default
+      - vault-network
     restart: always
 
   postgres:
@@ -33,3 +36,7 @@ services:
 volumes:
   pgdata:
   redisdata:
+
+networks:
+  vault-network:
+    external: true
